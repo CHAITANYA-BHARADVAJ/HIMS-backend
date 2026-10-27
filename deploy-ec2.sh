@@ -39,10 +39,18 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-# 4. Build and start containers with Docker Compose
-echo "🚀 Building and starting containers (hims-backend + Caddy SSL)..."
+# 4. Remove any corrupted buildx plugin if present
+rm -f ~/.docker/cli-plugins/docker-buildx 2>/dev/null || true
+sudo rm -f /usr/local/lib/docker/cli-plugins/docker-buildx 2>/dev/null || true
+
+# 5. Build backend image with standard Docker build (fast and reliable)
+echo "🚀 Building backend image..."
+docker build -t hims-backend:latest .
+
+# 6. Start containers with Docker Compose
+echo "🚀 Starting containers (hims-backend + Caddy SSL)..."
 docker compose down || true
-docker compose up -d --build
+docker compose up -d
 
 echo "=========================================================="
 echo "✅ Backend successfully deployed!"
