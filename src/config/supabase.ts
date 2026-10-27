@@ -11,11 +11,20 @@ if (!supabaseUrl || !supabaseServiceKey) {
 }
 
 // Service-role client — bypasses RLS (for backend use only)
-export const supabase = createClient(supabaseUrl, supabaseServiceKey);
+export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+  },
+});
 
 // Anon client factory — for user-scoped queries (pass user's JWT)
 export function createUserClient(accessToken: string) {
   return createClient(supabaseUrl, process.env.SUPABASE_ANON_KEY!, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
     global: { headers: { Authorization: `Bearer ${accessToken}` } },
   });
 }
