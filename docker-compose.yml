@@ -1,10 +1,9 @@
-version: '3.8'
-
 services:
   hims-backend:
     build:
       context: .
       dockerfile: Dockerfile
+    image: hims-backend:latest
     container_name: hims-backend
     restart: unless-stopped
     ports:
