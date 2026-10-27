@@ -21,7 +21,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 15s
 
   caddy:
     image: caddy:2-alpine
@@ -37,8 +37,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      hims-backend:
-        condition: service_healthy
+      - hims-backend
 
 volumes:
   caddy_data:
