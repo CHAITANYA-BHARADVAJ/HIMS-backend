@@ -1,0 +1,18 @@
+{
+    # Global options
+    # Optional: email for Let's Encrypt renewal notices
+    # email your-email@example.com
+}
+
+# Automatic HTTPS for your EC2 public IP using nip.io or sslip.io (e.g. 13.233.50.12.nip.io)
+# Falls back to localhost if $DOMAIN is not set in .env
+{$DOMAIN:localhost} {
+    reverse_proxy hims-backend:3000
+
+    encode gzip zstd
+
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+    }
+}

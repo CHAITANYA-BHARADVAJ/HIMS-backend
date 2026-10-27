@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  hims-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hims-backend
+    restart: unless-stopped
+    ports:
+      # Direct port 3000 access (HTTP testing)
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: hims-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"     # HTTP & Let's Encrypt ACME challenges
+      - "443:443"   # Automatic HTTPS (SSL)
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      hims-backend:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:
